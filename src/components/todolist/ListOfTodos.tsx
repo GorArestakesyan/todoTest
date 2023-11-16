@@ -54,6 +54,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginInline: "2vw",
   },
   trashContainer: {
+    width: "90%",
+    margin: "0 auto",
     marginBlock: "4vh",
     display: "flex",
     flexDirection: "column",
