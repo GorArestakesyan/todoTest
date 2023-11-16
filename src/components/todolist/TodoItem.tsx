@@ -8,19 +8,25 @@ import EditIcon from "@material-ui/icons/Edit";
 import SaveIcon from "@material-ui/icons/Save";
 import Checkbox, { checkboxClasses } from "@mui/material/Checkbox";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { deleteTodo, setTodos } from "../../redux/todoSlice";
+import { Todo } from "../../types/todoTypes";
 
-const TodoItem = ({ todo, todos, trash, setTodos }) => {
+interface TodoItemProps {
+  todo: Todo;
+}
+
+const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const [isEditing, setEditing] = useState(false);
-  const [editedTodo, setEditedTodo] = useState({
-    ...todo,
-  });
+  const [editedTodo, setEditedTodo] = useState({ ...todo });
+  const { todos } = useSelector((state: RootState) => state.todos);
 
   const handleEditToggle = () => {
     setEditing(!isEditing);
-    setEditedTodo({
-      ...todo,
-    });
+    setEditedTodo({ ...todo });
   };
 
   const handleCheck = () => {
@@ -32,15 +38,11 @@ const TodoItem = ({ todo, todos, trash, setTodos }) => {
           }
         : item
     );
-
-    setTodos({ trash, todos: updatedTodos });
+    dispatch(setTodos(updatedTodos));
   };
 
   const onDelete = () => {
-    setTodos({
-      trash: trash.some((el) => el.id === todo.id) ? trash : [...trash, todo],
-      todos: todos.filter((item) => item.id !== todo.id),
-    });
+    dispatch(deleteTodo(todo.id));
   };
 
   const handleSave = () => {
@@ -48,11 +50,11 @@ const TodoItem = ({ todo, todos, trash, setTodos }) => {
       item.id === todo.id ? editedTodo : item
     );
 
-    setTodos({ trash, todos: updatedTodos });
+    dispatch(setTodos(updatedTodos));
     setEditing(false);
   };
 
-  const handleEditDate = (e) => {
+  const handleEditDate = (e: React.ChangeEvent<HTMLInputElement>) => {
     let todoStatusCheck =
       new Date().getTime() > new Date(e.target.value)?.getTime()
         ? "Overdue"
@@ -70,24 +72,27 @@ const TodoItem = ({ todo, todos, trash, setTodos }) => {
       {todo.status !== "Overdue" && !isEditing && (
         <Checkbox
           disabled={isEditing}
+          size="small"
           checked={todo.status !== "Completed" ? false : true}
           onChange={handleCheck}
           sx={{
             [`&, &.${checkboxClasses.checked}`]: {
               color: "#00d900",
+              padding: "2px",
             },
           }}
         />
       )}
       {!isEditing && (
         <Typography className={classes.statusText}>
-          Status : {todo.status}
+          Status: {todo.status}
         </Typography>
       )}
       <Box className={classes.todoInfo}>
         <Box className={classes.editBox}>
           {isEditing ? (
-            <>
+            <Box className={classes.editingBox}>
+              <Typography className={classes.deadline}>Title</Typography>
               <TextField
                 fullWidth
                 size="small"
@@ -98,6 +103,7 @@ const TodoItem = ({ todo, todos, trash, setTodos }) => {
                   setEditedTodo({ ...editedTodo, title: e.target.value })
                 }
               />
+              <Typography className={classes.deadline}>Description</Typography>
               <TextField
                 fullWidth
                 size="small"
@@ -105,31 +111,35 @@ const TodoItem = ({ todo, todos, trash, setTodos }) => {
                 className={classes.editingInputs}
                 value={editedTodo.description}
                 onChange={(e) =>
-                  setEditedTodo({ ...editedTodo, description: e.target.value })
+                  setEditedTodo({
+                    ...editedTodo,
+                    description: e.target.value,
+                  })
                 }
               />
-            </>
+              <Typography className={classes.deadline}>Deadline</Typography>
+              <TextField
+                id="dateField"
+                name="todoDate"
+                fullWidth
+                size="small"
+                type="date"
+                className={classes.editingInputs}
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={editedTodo.date}
+                onChange={handleEditDate}
+              />
+            </Box>
           ) : (
             <Typography className={classes.todoInfoText}>
               {todo.title}
             </Typography>
           )}
-          {isEditing ? (
-            <TextField
-              id="dateField"
-              name="todoDate"
-              fullWidth
-              size="small"
-              type="date"
-              className={classes.editingInputs}
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={editedTodo.date}
-              onChange={handleEditDate}
-            />
-          ) : (
+
+          {!isEditing && (
             <React.Fragment>
               <Typography
                 className={
@@ -147,22 +157,37 @@ const TodoItem = ({ todo, todos, trash, setTodos }) => {
           )}
         </Box>
       </Box>
-      <>
+      <React.Fragment>
         {isEditing ? (
-          <IconButton onClick={handleSave} color="primary" title="Save">
+          <IconButton
+            onClick={handleSave}
+            color="primary"
+            title="Save"
+            className={classes.icon}
+          >
             <SaveIcon />
           </IconButton>
         ) : (
           <Box className={classes.editDelBlock}>
-            <IconButton onClick={handleEditToggle} color="primary" title="Edit">
+            <IconButton
+              onClick={handleEditToggle}
+              color="primary"
+              title="Edit"
+              className={classes.icon}
+            >
               <EditIcon className={classes.icon} />
             </IconButton>
-            <IconButton onClick={onDelete} color="secondary" title="Delete">
+            <IconButton
+              onClick={onDelete}
+              color="secondary"
+              title="Delete"
+              className={classes.icon}
+            >
               <DeleteIcon className={classes.icon} />
             </IconButton>
           </Box>
         )}
-      </>
+      </React.Fragment>
     </Box>
   );
 };
@@ -188,16 +213,30 @@ let useStyles = makeStyles((theme) => ({
       width: "90%",
     },
     [theme.breakpoints.down("sm")]: {
+      display: "flex",
       padding: "4px",
+      gap: "8px",
       width: "100%",
     },
   },
-
+  editingBox: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "2%",
+    [theme.breakpoints.down("xs")]: {
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "flex-start",
+    },
+  },
   todoInfo: {
     display: "flex",
     justifyContent: "space-around",
+    flexDirection: "row",
     flexGrow: 1,
     [theme.breakpoints.down("sm")]: {
+      display: "flex",
       flexDirection: "column",
       alignItems: "center",
     },
@@ -211,6 +250,7 @@ let useStyles = makeStyles((theme) => ({
   },
   todoInfoText: {
     fontSize: "1rem",
+    fontFamily: "Exo-Regular",
     [theme.breakpoints.down("md")]: {
       fontSize: "0.9em !important",
       maxWidth: "50ch",
@@ -219,6 +259,8 @@ let useStyles = makeStyles((theme) => ({
       textOverflow: "ellipsis",
     },
     [theme.breakpoints.down("xs")]: {
+      display: "flex",
+      flexDirection: "column",
       fontSize: "0.6em !important",
       maxWidth: "15ch",
       overflow: "hidden",
@@ -228,25 +270,35 @@ let useStyles = makeStyles((theme) => ({
   },
   statusText: {
     fontSize: "1rem",
+    fontFamily: "Exo-Light",
     textAlign: "center",
+    [theme.breakpoints.down("md")]: {
+      fontSize: "0.7rem !important",
+    },
+    [theme.breakpoints.down("md")]: {
+      fontSize: "0.7rem !important",
+    },
     [theme.breakpoints.down("sm")]: {
-      fontSize: "0.7em !important",
+      fontSize: "0.6rem !important",
     },
   },
   deadline: {
     fontSize: "0.9rem",
     color: "#777",
+    fontFamily: "Exo-Medium",
     textAlign: "center",
     [theme.breakpoints.down("sm")]: {
-      fontSize: "0.8em !important",
+      fontSize: "0.4em !important",
     },
   },
   editingInputs: {
-    paddingBlock: "10px",
+    paddingBlock: "1px",
   },
   icon: {
+    fontSize: "2rem",
     [theme.breakpoints.down("sm")]: {
-      fontSize: "medium",
+      fontSize: "1rem",
+      paddingInline: "1px",
     },
   },
   editDelBlock: {
@@ -257,13 +309,19 @@ let useStyles = makeStyles((theme) => ({
     },
   },
   editBox: {
-    width: "80%",
+    width: "100%",
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-around",
     flexDirection: "row",
+    justifyContent: "space-around",
+
     [theme.breakpoints.down("lg")]: {
       width: "100%",
+      flexDirection: "row",
+    },
+    [theme.breakpoints.down("sm")]: {
+      width: "100%",
+      flexDirection: "row",
     },
     [theme.breakpoints.down("xs")]: {
       display: "flex",

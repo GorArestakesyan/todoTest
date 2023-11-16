@@ -1,9 +1,42 @@
+@font-face {
+  font-family: "Exo-Light";
+  font-style: normal;
+  font-weight: 300;
+  src: url("../public/assets/fonts/Exo-Light.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Exo-Regular";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../public/assets/fonts/Exo-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Exo-Medium";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../public/assets/fonts/Exo-Medium.ttf") format("truetype");
+}
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* outline: 1px solid red; */
 }
 body {
-  background: -webkit-linear-gradient(to right, #b6fbff, #83a4d4);
-  background: linear-gradient(to right, #b6fbff, #83a4d4);
+  background-image: url("../public/assets/svgs/patternpad.svg");
+  background-size: cover;
+  background-repeat: repeat;
+}
+.bodyContainer {
+  border-radius: 10px;
+  width: 90vw;
+  margin-top: 4vh;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
 }

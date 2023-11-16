@@ -1,41 +1,28 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import TrashIcon from "@material-ui/icons/DeleteSweepRounded";
 import { Box, Typography } from "@mui/material";
 import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 import TodoItem from "./TodoItem";
 import TodoItemPreview from "./TodoItemPreview";
 
-function ListOfTodos({ todos, trash, setTodos }) {
+function ListOfTodos() {
   const classes = useStyles();
-  const onDelete = (id) => {
-    setTodos({ todos, trash: trash.filter((todo) => todo.id !== id) });
-  };
-  const onPutBack = (todo) => {
-    setTodos({
-      todos: [...todos, todo],
-      trash: trash.filter((item) => item.id !== todo.id),
-    });
-  };
+  const { todos, trash } = useSelector((state: RootState) => state.todos);
+
   return (
     <Box>
       <Box className={classes.todoListContainer}>
         {todos.length ? (
-          todos?.map((todo) => (
-            <TodoItem
-              todo={todo}
-              key={todo.id}
-              todos={todos}
-              trash={trash}
-              setTodos={setTodos}
-            />
-          ))
+          todos?.map((todo) => <TodoItem todo={todo} key={todo.id} />)
         ) : (
           <Typography className={classes.noTodosText}>No todos</Typography>
         )}
       </Box>
       {!!trash.length && (
         <Box className={classes.trashContainer}>
-          <Typography variant="h5" className={classes.trashTitle}>
+          <Typography className={classes.trashTitle}>
             Trash
             <TrashIcon
               color="secondary"
@@ -47,11 +34,7 @@ function ListOfTodos({ todos, trash, setTodos }) {
       )}
       <Box className={classes.trashContainer}>
         {trash.map((todo) => (
-          <TodoItemPreview
-            todo={todo}
-            onDelete={onDelete}
-            onPutBack={onPutBack}
-          />
+          <TodoItemPreview todo={todo} key={todo.id} />
         ))}
       </Box>
     </Box>
@@ -59,10 +42,13 @@ function ListOfTodos({ todos, trash, setTodos }) {
 }
 
 export default ListOfTodos;
-let useStyles = makeStyles((theme) => ({
+
+const useStyles = makeStyles((theme: Theme) => ({
   trashTitle: {
     display: "flex",
+    fontSize: "1rem !important",
     alignItems: "center",
+    fontFamily: "Exo-Regular",
   },
   trashIcon: {
     marginInline: "2vw",
@@ -78,15 +64,15 @@ let useStyles = makeStyles((theme) => ({
     height: "50vh",
     marginTop: "3vh",
     overflowY: "auto",
-    width: "60vw",
+    width: "90%",
     margin: "0 auto",
-    border: "1px solid #fff",
     borderRadius: "5px",
     [theme.breakpoints.down("md")]: {
-      width: "80vw",
+      width: "80%",
     },
     [theme.breakpoints.down("sm")]: {
-      width: "95vw",
+      width: "100%",
+      border: "none",
     },
   },
   deletedTodo: {
@@ -126,6 +112,7 @@ let useStyles = makeStyles((theme) => ({
   },
   noTodosText: {
     fontSize: "3em !important",
+    fontFamily: "Exo-Light",
     textAlign: "center",
     paddingTop: "10%",
     color: "#fff",
