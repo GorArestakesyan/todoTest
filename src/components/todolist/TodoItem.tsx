@@ -195,6 +195,33 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
 export default TodoItem;
 
 let useStyles = makeStyles((theme) => ({
+  "@keyframes slideInFromTop": {
+    "0%": {
+      transform: "translateY(15vh)",
+      zIndex: "999",
+    },
+    "100%": {
+      transform: "translateY(0)",
+      zIndex: "1",
+    },
+  },
+  "@keyframes fadein": {
+    "0%": {
+      opacity: 0,
+    },
+    "100%": {
+      opacity: 1,
+    },
+  },
+  "@keyframes changeHeight": {
+    "0%": {
+      fontSize: "0rem",
+    },
+    "100%": {
+      display: "1rem",
+    },
+  },
+  
   itemEdit: {
     marginBlock: "1%",
     display: "flex",
@@ -208,7 +235,7 @@ let useStyles = makeStyles((theme) => ({
     border: "1px solid #ccc",
     borderRadius: "5px",
     boxShadow: "0px 5px 9px 0px #a5a4a4",
-
+    animation: "$slideInFromTop 500ms ease-in ",
     [theme.breakpoints.down("md")]: {
       width: "90%",
     },
@@ -223,6 +250,7 @@ let useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    animation: "$fadein 300ms ease-out",
     gap: "2%",
     [theme.breakpoints.down("xs")]: {
       flexDirection: "column",
@@ -232,6 +260,7 @@ let useStyles = makeStyles((theme) => ({
   },
   todoInfo: {
     display: "flex",
+    
     justifyContent: "space-around",
     flexDirection: "row",
     flexGrow: 1,
@@ -295,6 +324,7 @@ let useStyles = makeStyles((theme) => ({
     paddingBlock: "1px",
   },
   icon: {
+    animation: "$changeHeight 200ms ease-out",
     fontSize: "2rem",
     [theme.breakpoints.down("sm")]: {
       fontSize: "1rem",

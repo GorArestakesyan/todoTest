@@ -62,10 +62,19 @@ const TodoItemPreview: React.FC<TodoItemPreviewProps> = ({ todo }) => {
 };
 
 const useStyles = makeStyles((theme: Theme) => ({
+  "@keyframes slideInFromTop": {
+    "0%": {
+      transform: "translateY(-15vh)",
+    },
+    "100%": {
+      transform: "translateY(0)",
+    },
+  },
   itemPreview: {
     marginBlock: "1%",
     display: "flex",
     width: "90%",
+    animation: "$slideInFromTop 300ms ease-in ",
     marginLeft: "auto",
     marginRight: "auto",
     alignItems: "center",
@@ -93,6 +102,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       maxWidth: "30ch",
       textAlign: "center",
       overflow: "hidden",
+
       whiteSpace: "nowrap",
       textOverflow: "ellipsis",
     },
