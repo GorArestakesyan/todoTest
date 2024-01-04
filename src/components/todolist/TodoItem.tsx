@@ -46,12 +46,16 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
   };
 
   const handleSave = () => {
-    const updatedTodos = todos.map((item) =>
-      item.id === todo.id ? editedTodo : item
-    );
+    if (editedTodo.title) {
+      const updatedTodos = todos.map((item) =>
+        item.id === todo.id ? editedTodo : item
+      );
 
-    dispatch(setTodos(updatedTodos));
-    setEditing(false);
+      dispatch(setTodos(updatedTodos));
+      setEditing(false);
+    } else {
+      alert("Todo title can't be empty");
+    }
   };
 
   const handleEditDate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +98,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
             <Box className={classes.editingBox}>
               <Typography className={classes.deadline}>Title</Typography>
               <TextField
+                required
                 fullWidth
                 size="small"
                 variant="outlined"
@@ -221,7 +226,7 @@ let useStyles = makeStyles((theme) => ({
       display: "1rem",
     },
   },
-  
+
   itemEdit: {
     marginBlock: "1%",
     display: "flex",
@@ -260,7 +265,7 @@ let useStyles = makeStyles((theme) => ({
   },
   todoInfo: {
     display: "flex",
-    
+
     justifyContent: "space-around",
     flexDirection: "row",
     flexGrow: 1,
